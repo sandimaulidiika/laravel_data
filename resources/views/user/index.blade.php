@@ -41,8 +41,8 @@
                                             onclick="window.location='{{ route('user.edit', ['id' => $key->id]) }}'">
                                             <i class="fas fa-edit"></i> Edit
                                         </button>
-                                        <button class="btn btn-danger" data-bs-toggle="modal"
-                                            data-bs-target="#deleteModal{{ $key->id }}">
+                                        <button class="btn btn-danger" data-toggle="modal"
+                                            data-target="#deleteModal{{ $key->id }}">
                                             <i class="fas fa-trash-alt"></i> Delete
                                         </button>
                                     </td>
@@ -58,23 +58,23 @@
 
     <!-- Modal delete-->
     @foreach ($data as $key)
-        <div class="modal fade" id="deleteModal{{ $key->id }}" tabindex="-1"
-            aria-labelledby="deleteModal{{ $key->id }}Label" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
+        <!-- Logout Modal-->
+        <div class="modal fade" id="deleteModal{{ $key->id }}" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <form action="{{ route('user.delete', ['id' => $key->id]) }}" method="POST">
                         @csrf
                         @method('DELETE')
                         <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="deleteModal{{ $key->id }}Label">Confirmation Delete Data
-                            </h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h5 class="modal-title" id="exampleModalLabel">Confirmation Delete Data</h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
                         </div>
-                        <div class="modal-body">
-                            Sure you want to delete the name data <b>{{ $key->name }}</b>?
-                        </div>
+                        <div class="modal-body">Sure you want to delete the name data <b>{{ $key->name }}</b>?</div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-danger">Yes, i am sure</button>
                         </div>
                     </form>

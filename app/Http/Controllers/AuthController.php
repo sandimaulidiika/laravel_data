@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
+use App\Providers\RouteServiceProvider;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -15,29 +19,28 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function authenticate(Request $request)
+    public function authenticate(LoginRequest $request): RedirectResponse
     {
         $request->validate([
             'email' => 'required|email',
             'password' => 'required'
         ]);
 
-        $data = [
-            'email' => $request->email,
-            'password' => $request->password
-        ];
+        $request->authenticate();
 
-        if (Auth()->attempt($data)) {
-            $request->session()->regenerate();
-            return redirect()->intended('dashboard')->with('success', 'You success login');;
-        } else {
-            return back()->with('failed', 'Email or password is wrong');
-        }
+        $request->session()->regenerate();
+
+        return redirect()->intended(RouteServiceProvider::HOME)->with('success', 'You success login');
     }
 
-    public function logout()
+    public function logout(Request $request): RedirectResponse
     {
         auth()->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
         return redirect()->route('login')->with('success', 'You have been logged out');
     }
 
@@ -58,15 +61,17 @@ class AuthController extends Controller
         $data = [
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password_confirmation)
+            'password' => bcrypt($request->password_confirmation),
+            'image' => '1687409920.JPG'
         ];
+        event(new Registered($data));
 
         $user = User::create($data);
 
         if ($user) {
-            return redirect()->route('login')->with('success', 'You have been registered, please login');
+            return redirect()->intended('login')->with('success', 'You have been registered, please login');
         } else {
-            return redirect()->route('register')->with('failed', 'Failed to register');
+            return back()->with('failed', 'Failed to register');
         }
     }
 }
