@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class HomeController extends Controller
@@ -30,18 +31,26 @@ class HomeController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'name' => 'required',
-            'password' => 'required|min:4'
+            'password' => 'required|min:4',
+            'image' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
         ]);
 
         if ($validator->fails()) return redirect()->back()->withInput()->withErrors($validator);
 
+        $file = $request->file('image');
+        $imageName = time() . '.' . $request->image->extension();
+        $path = $file->storeAs('images/' . $imageName);
+
+        Storage::disk('public')->put($path, $imageName, $file);
+
         $data['email'] = $request->email;
         $data['name'] = $request->name;
         $data['password'] = Hash::make($request->password);
+        $data['image'] = $imageName;
 
         User::create($data);
 
-        return redirect()->route('index')->with('success', 'with the name ' . $request->fullname . ' has been added');
+        return redirect()->route('user')->with('success', 'with the name ' . $request->fullname . ' has been added');
     }
 
     public function edit(Request $request, $id)
@@ -77,6 +86,6 @@ class HomeController extends Controller
         if ($data) {
             $data->delete();
         }
-        return redirect()->route('index')->with('success', 'Has been deleted');
+        return redirect()->route('user')->with('success', 'Has been deleted');
     }
 }

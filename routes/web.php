@@ -14,15 +14,18 @@ use App\Http\Controllers\AuthController;
 |
 */
 
-Route::get('/login', [AuthController::class, 'index'])->name('login');
-Route::post('/proses', [AuthController::class, 'proses'])->name('proses');
+Route::get('/', [AuthController::class, 'index'])->middleware('guest')->name('login');
+Route::post('/login', [AuthController::class, 'authenticate'])->name('authenticate');
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
+Route::get('/register', [AuthController::class, 'register'])->middleware('guest')->name('register');
+Route::post('/register', [AuthController::class, 'store'])->name('register');
 
-Route::get('/user', [HomeController::class, 'user'])->name('user');
-Route::get('/create', [HomeController::class, 'create'])->name('user.create');
-Route::post('/store', [HomeController::class, 'store'])->name('user.store');
+Route::get('/dashboard', [HomeController::class, 'dashboard'])->middleware('auth')->name('dashboard');
+
+Route::get('/user', [HomeController::class, 'user'])->middleware('auth')->name('user');
+Route::get('/create', [HomeController::class, 'create'])->middleware('auth')->name('user.create');
+Route::post('/store', [HomeController::class, 'store'])->middleware('auth')->name('user.store');
 
 Route::get('/edit/{id}', [HomeController::class, 'edit'])->name('user.edit');
 Route::put('/update/{id}', [HomeController::class, 'update'])->name('user.update');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -14,7 +15,7 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function proses(Request $request)
+    public function authenticate(Request $request)
     {
         $request->validate([
             'email' => 'required|email',
@@ -26,10 +27,11 @@ class AuthController extends Controller
             'password' => $request->password
         ];
 
-        if (auth()->attempt($data)) {
-            return redirect()->route('dashboard')->with('success', 'You success login');;
+        if (Auth()->attempt($data)) {
+            $request->session()->regenerate();
+            return redirect()->intended('dashboard')->with('success', 'You success login');;
         } else {
-            return redirect()->route('login')->with('failed', 'Email or Password is Wrong');
+            return back()->with('failed', 'Email or password is wrong');
         }
     }
 
@@ -37,5 +39,34 @@ class AuthController extends Controller
     {
         auth()->logout();
         return redirect()->route('login')->with('success', 'You have been logged out');
+    }
+
+    public function register()
+    {
+        return view('auth.register');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|min:3|max:50',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:4|max:50|confirmed',
+            'password_confirmation' => 'required'
+        ]);
+
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password_confirmation)
+        ];
+
+        $user = User::create($data);
+
+        if ($user) {
+            return redirect()->route('login')->with('success', 'You have been registered, please login');
+        } else {
+            return redirect()->route('register')->with('failed', 'Failed to register');
+        }
     }
 }

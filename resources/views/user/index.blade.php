@@ -22,6 +22,7 @@
                         <thead>
                             <tr>
                                 <th>NO</th>
+                                <th>Foto</th>
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Action</th>
@@ -31,6 +32,8 @@
                             @foreach ($data as $key)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
+                                    <td><img src="{{ asset('storage/images/' . $key->image) }}" width="100"
+                                            class="rounded mx-auto d-block" alt="{{ $key->name }}"></td>
                                     <td>{{ $key->name }}</td>
                                     <td>{{ $key->email }}</td>
                                     <td>
