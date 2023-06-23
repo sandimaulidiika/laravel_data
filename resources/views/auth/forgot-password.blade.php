@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin 2 - Login</title>
+    <title>SB Admin 2 - Forgot Password</title>
 
     <!-- Custom fonts for this template-->
     <link href="{{ asset('/') }}assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -38,9 +38,18 @@
                             <div class="col">
                                 <div class="p-5">
                                     <div class="text-center">
-                                        <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                                        <h1 class="h4 text-gray-900 mb-2">Forgot Your Password?</h1>
+                                        <p class="mb-4">We get it, stuff happens. Just enter your email address below
+                                            and we'll send you a link to reset your password!</p>
                                     </div>
-                                    <form action="{{ route('authenticate') }}" method="POST" class="user">
+
+                                    @if (session('status'))
+                                        <div class="alert alert-success">
+                                            {{ session('status') }}
+                                        </div>
+                                    @endif
+
+                                    <form action="{{ route('password.request') }}" method="POST" class="user">
                                         @csrf
                                         <div class="form-group">
                                             <input type="email"
@@ -48,37 +57,22 @@
                                                 id="email" name="email" aria-describedby="emailHelp"
                                                 placeholder="Enter Email Address..." value="{{ old('email') }}">
                                             @error('email')
-                                                <div id="validationServerUsernameFeedback" class="invalid-feedback">
-                                                    {{ $message }}</div>
+                                                <div class="invalid-feedback">
+                                                    {{ $message }}
+                                                </div>
                                             @enderror
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="password"
-                                                class="form-control form-control-user @error('password') is-invalid @enderror"
-                                                id="password" name="password" placeholder="Password">
-                                            @error('password')
-                                                <div id="validationServerUsernameFeedback" class="invalid-feedback">
-                                                    {{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        <div class="form-group">
-                                            <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck"
-                                                    name="remember">
-                                                <label class="custom-control-label" for="customCheck">Remember
-                                                    Me</label>
-                                            </div>
                                         </div>
                                         <button type="submit" class="btn btn-primary btn-user btn-block">
-                                            Login
+                                            Reset Password
                                         </button>
                                     </form>
                                     <hr>
                                     <div class="text-center">
-                                        <a class="small" href="{{ route('password.request') }}">Forgot Password?</a>
+                                        <a class="small" href="{{ route('register') }}">Create an Account!</a>
                                     </div>
                                     <div class="text-center">
-                                        <a class="small" href="{{ route('register') }}">Create an Account!</a>
+                                        <a class="small" href="{{ route('login') }}">Already have an account?
+                                            Login!</a>
                                     </div>
                                 </div>
                             </div>
@@ -101,32 +95,6 @@
 
     <!-- Custom scripts for all pages-->
     <script src="{{ asset('/') }}assets/js/sb-admin-2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    {{-- sweet alert --}}
-    @if ($message = Session::get('failed'))
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: '{{ $message }}',
-            })
-        </script>
-    @endif
-    @if ($message = Session::get('success'))
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: '{{ $message }}',
-            })
-            Swal.fire(
-                'Good job!',
-                '{{ $message }}',
-                'success'
-            )
-        </script>
-    @endif
 
 </body>
 

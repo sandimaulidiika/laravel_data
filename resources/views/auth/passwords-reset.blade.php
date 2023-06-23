@@ -37,20 +37,14 @@
                         <div class="row">
                             <div class="col">
                                 <div class="p-5">
-                                    <div class="text-center">
-                                        <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
-                                    </div>
-                                    <form action="{{ route('authenticate') }}" method="POST" class="user">
+                                    <form action="{{ route('password.store') }}" method="POST" class="user">
                                         @csrf
+                                        <input type="hidden" name="token" value="{{ $request->token }}">
                                         <div class="form-group">
-                                            <input type="email"
-                                                class="form-control form-control-user @error('email') is-invalid @enderror"
-                                                id="email" name="email" aria-describedby="emailHelp"
-                                                placeholder="Enter Email Address..." value="{{ old('email') }}">
-                                            @error('email')
-                                                <div id="validationServerUsernameFeedback" class="invalid-feedback">
-                                                    {{ $message }}</div>
-                                            @enderror
+                                            <input type="email" class="form-control form-control-user" id="email"
+                                                name="email" aria-describedby="emailHelp"
+                                                placeholder="Enter Email Address..."
+                                                value="{{ old('email', $request->email) }}" readonly>
                                         </div>
                                         <div class="form-group">
                                             <input type="password"
@@ -62,24 +56,19 @@
                                             @enderror
                                         </div>
                                         <div class="form-group">
-                                            <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck"
-                                                    name="remember">
-                                                <label class="custom-control-label" for="customCheck">Remember
-                                                    Me</label>
-                                            </div>
+                                            <input type="password"
+                                                class="form-control form-control-user @error('password') is-invalid @enderror"
+                                                id="password_confirmation" name="password_confirmation"
+                                                placeholder="Confirmation Password">
+                                            @error('password_confirmation')
+                                                <div id="validationServerUsernameFeedback" class="invalid-feedback">
+                                                    {{ $message }}</div>
+                                            @enderror
                                         </div>
                                         <button type="submit" class="btn btn-primary btn-user btn-block">
-                                            Login
+                                            Reset Password
                                         </button>
                                     </form>
-                                    <hr>
-                                    <div class="text-center">
-                                        <a class="small" href="{{ route('password.request') }}">Forgot Password?</a>
-                                    </div>
-                                    <div class="text-center">
-                                        <a class="small" href="{{ route('register') }}">Create an Account!</a>
-                                    </div>
                                 </div>
                             </div>
                         </div>

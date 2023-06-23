@@ -8,6 +8,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -26,11 +27,18 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        $request->authenticate();
+        $data = [
+            'email' => $request->email,
+            'password' => $request->password
+        ];
 
         $request->session()->regenerate();
 
-        return redirect()->intended(RouteServiceProvider::HOME)->with('success', 'You success login');
+        if (Auth::attempt($data)) {
+            return redirect()->intended(RouteServiceProvider::HOME)->with('success', 'You success login');
+        } else {
+            return back()->with('failed', 'Failed to login');
+        }
     }
 
     public function logout(Request $request): RedirectResponse
@@ -52,8 +60,8 @@ class AuthController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|min:3|max:50',
             'email' => 'required|email|unique:users',
+            'name' => 'required|min:3|max:50',
             'password' => 'required|min:4|max:50|confirmed',
             'password_confirmation' => 'required'
         ]);
@@ -64,6 +72,7 @@ class AuthController extends Controller
             'password' => bcrypt($request->password_confirmation),
             'image' => '1687409920.JPG'
         ];
+
         event(new Registered($data));
 
         $user = User::create($data);
