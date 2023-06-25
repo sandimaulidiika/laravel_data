@@ -9,6 +9,9 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -20,7 +23,7 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function authenticate(LoginRequest $request): RedirectResponse
+    public function authenticate(Request $request): RedirectResponse
     {
         $request->validate([
             'email' => 'required|email',
@@ -60,27 +63,22 @@ class AuthController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|unique:users',
-            'name' => 'required|min:3|max:50',
-            'password' => 'required|min:4|max:50|confirmed',
-            'password_confirmation' => 'required'
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $data = [
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password_confirmation),
             'image' => '1687409920.JPG'
-        ];
+        ]);
 
-        event(new Registered($data));
+        event(new Registered($user));
 
-        $user = User::create($data);
+        Auth::login($user);
 
-        if ($user) {
-            return redirect()->intended('login')->with('success', 'You have been registered, please login');
-        } else {
-            return back()->with('failed', 'Failed to register');
-        }
+        return redirect(RouteServiceProvider::HOME);
     }
 }
